@@ -560,7 +560,8 @@ Symbol assign_class::type_check(Symbol class_, ClassTable *classtable) {
 }
 
 Symbol static_dispatch_class::type_check(Symbol class_, ClassTable *classtable) {
-  if (!classtable->subtype(classtable->evaltype(class_, type_name), classtable->evaltype(class_, expr->type_check(class_, classtable)))) {
+  Symbol t0 = expr->type_check(class_, classtable);
+  if (!classtable->subtype(classtable->evaltype(class_, type_name), classtable->evaltype(class_, t0))) {
     classtable->semant_error(classtable->get_class(class_)) << name << ": type name is not match!" << endl;
     return Object;
   }
@@ -578,14 +579,14 @@ Symbol static_dispatch_class::type_check(Symbol class_, ClassTable *classtable) 
       classtable->semant_error(classtable->get_class(class_)) << name << ": " << " the number of parameters is not match!" << endl;
       return Object;
     }
-    if (!classtable->subtype(classtable->evaltype(type_name, formal_types->hd()), classtable->evaltype(class_, ti))) {
+    if (!classtable->subtype(classtable->evaltype(t0, formal_types->hd()), classtable->evaltype(class_, ti))) {
       classtable->semant_error(classtable->get_class(class_)) << name << ": " << i+1 << "th parameter is not match! expect: " << formal_types->hd() << " but actaul: " << ti << endl;
       return Object;
     }
     formal_types = formal_types->tl();
   }
 
-  return set_type(classtable->evaltype(type_name, t_return))->get_type();
+  return set_type(classtable->evaltype(t0, t_return))->get_type();
 }
 
 Symbol dispatch_class::type_check(Symbol class_, ClassTable *classtable) {
